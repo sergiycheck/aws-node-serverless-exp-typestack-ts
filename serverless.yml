@@ -1,0 +1,33 @@
+service: aws-node-exp-ts
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: eu-central-1
+  deploymentMethod: direct
+  environment:
+    NODE_ENV: dev
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+
+package:
+  exclude:
+    - config/.env.stg
+    - config/.env.pro
+  include:
+    - config/.env.dev
+
+functions:
+  api:
+    handler: app/handler-vendia.handler
+    events:
+      - httpApi: '*'
+
+custom:
+  serverless-offline:
+    httpPort: 3029
+  serverlessPluginTypescript:
+    tsConfigFileLocation: './tsconfig.build.json'
