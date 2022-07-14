@@ -1,3 +1,5 @@
+import { Response } from 'express';
+import { Service } from 'typedi';
 import { CustomLog } from '../logger/customLogger';
 import { ResponseVO } from '../model/vo/responseVo';
 
@@ -5,6 +7,7 @@ enum StatusCode {
   success = 200,
 }
 
+@Service()
 export class Result {
   public statusCode: number;
 
@@ -14,39 +17,53 @@ export class Result {
 
   public data?: any;
 
-  constructor(statusCode: number, code: number, message: string, data?: any) {
+  setResponseData(
+    statusCode: number,
+    code: number,
+    message: string,
+    data?: any
+  ) {
     this.statusCode = statusCode;
     this.code = code;
     this.message = message;
     this.data = data;
   }
 
+  getDataToObj() {
+    return {
+      code: this.code,
+      message: this.message,
+      data: this.data,
+    };
+  }
+
   /**
    * Serverless: According to the API Gateway specs, the body content must be stringified
    */
-  bodyToString() {
-    return {
-      statusCode: this.statusCode,
-      body: JSON.stringify({
-        code: this.code,
-        message: this.message,
-        data: this.data,
-      }),
-    };
+  bodyToString(res: Response) {
+    return res.status(this.statusCode).json(this.getDataToObj());
   }
 }
 
+@Service()
 export class MessageUtil {
-  static success(data: object): ResponseVO {
-    const result = new Result(StatusCode.success, 0, 'success', data);
+  constructor(public result: Result) {}
 
-    return result.bodyToString();
+  success(data: object, res: Response) {
+    this.result.setResponseData(StatusCode.success, 0, 'success', data);
+
+    return this.result.bodyToString(res);
   }
 
-  static error(code = 1000, message: string) {
-    const result = new Result(StatusCode.success, code, message);
+  error(code = 1000, message: string, res: Response) {
+    const result = this.result.setResponseData(
+      StatusCode.success,
+      code,
+      message
+    );
 
-    CustomLog.log(result.bodyToString());
-    return result.bodyToString();
+    CustomLog.log(this.result.getDataToObj());
+
+    return this.result.bodyToString(res);
   }
 }

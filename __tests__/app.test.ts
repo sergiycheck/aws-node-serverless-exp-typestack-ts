@@ -1,5 +1,5 @@
 import * as bookMocks from '../mocks/books.mock';
-import BooksController from '../app/controller/books';
+import BooksController from '../app/controllers/books';
 import { Books } from '../app/model';
 import { Result } from '../app/utils/message';
 

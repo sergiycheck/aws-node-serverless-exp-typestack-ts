@@ -1,13 +1,16 @@
+import { BookModelName } from './../model/books';
 import { Model } from 'mongoose';
+import { Inject, Service } from 'typedi';
 import { CustomLog } from '../logger/customLogger';
 import { Book } from '../model';
 import { CreateBookDTO, UpdateBookDTO } from '../model/dto/dtos.dto';
 import { ResponseBook } from '../model/vo/responseVo';
 
+@Service()
 class BooksService {
   private books: Model<Book>;
 
-  constructor(books: Model<Book>) {
+  constructor(@Inject(BookModelName) books: Model<Book>) {
     this.books = books;
   }
 
