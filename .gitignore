@@ -19,4 +19,6 @@ out-logger.json
 /**/*.env.stg
 test-results
 lib
+dist-esb
+.esbuild
 

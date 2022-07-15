@@ -1,7 +1,7 @@
 import * as bookMocks from '../mocks/books.mock';
-import BooksController from '../app/controllers/books';
-import { Books } from '../app/model';
-import { Result } from '../app/utils/message';
+import BooksController from '../src/app/controllers/books.controller';
+import { Books } from '../src/app/model';
+import { Result } from '../src/app/utils/message';
 
 const booksController = new BooksController(Books);
 

@@ -1,13 +1,12 @@
 import { CustomLog } from '../logger/customLogger';
 import { UpdateBookDTO } from '../model/dto/dtos.dto';
 import { MessageUtil } from '../utils/message';
-import BooksService from '../service/books';
+import BooksService from '../service/books.service';
 import { CreateBookDTO } from '../model/dto/dtos.dto';
 import { Service } from 'typedi';
 import {
   Controller,
   Post,
-  UseAfter,
   UseBefore,
   Get,
   Put,
@@ -15,8 +14,6 @@ import {
   Body,
   Param,
   Res,
-  UseInterceptor,
-  Action,
 } from 'routing-controllers';
 import { loggingMiddleware } from '../middlewares/logger.middleware';
 import { getCurrentInvoke } from '@vendia/serverless-express';

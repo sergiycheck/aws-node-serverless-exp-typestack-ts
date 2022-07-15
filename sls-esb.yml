@@ -10,24 +10,25 @@ provider:
     NODE_ENV: dev
 
 plugins:
-  - serverless-plugin-typescript
   - serverless-offline
+  - serverless-esbuild
 
 package:
   exclude:
-    - config/.env.stg
-    - config/.env.pro
+    - src/config/.env.stg
+    - src/config/.env.pro
   include:
-    - config/.env.dev
+    - src/config/.env.dev
 
 functions:
   api:
-    handler: app/handler-vendia.handler
+    handler: src/app/handler-vendia.handler
     events:
       - httpApi: '*'
 
 custom:
   serverless-offline:
     httpPort: 3029
-  serverlessPluginTypescript:
-    tsConfigFileLocation: './tsconfig.build.json'
+  esbuild:
+    packager: yarn
+    target: 'node16'

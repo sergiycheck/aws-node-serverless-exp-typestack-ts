@@ -3,7 +3,6 @@ import { Response } from 'express';
 import { getCurrentInvoke } from '@vendia/serverless-express';
 import { createExpressServer, useContainer } from 'routing-controllers';
 import { Container } from 'typedi';
-import bodyParser from 'body-parser';
 
 import BooksController from './controllers/books.controller';
 import errorHandler from './error-handler';

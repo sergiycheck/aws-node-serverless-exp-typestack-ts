@@ -2,11 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch main.ts",
+      "name": "Launch handler-vendia.ts ts",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "local:dev"],
+      "runtimeArgs": ["run", "local:dev-ts"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Launch handler-vendia.ts esb",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "local:dev-esb"],
       "console": "integratedTerminal"
     }
   ]

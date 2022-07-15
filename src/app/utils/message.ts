@@ -1,7 +1,6 @@
 import { Response } from 'express';
 import { Service } from 'typedi';
 import { CustomLog } from '../logger/customLogger';
-import { ResponseVO } from '../model/vo/responseVo';
 
 enum StatusCode {
   success = 200,
