@@ -1,4 +1,4 @@
-import { ResponseBook } from './../app/model/vo/responseVo';
+import { ResponseBook } from '../src/app/model/vo/responseVo';
 
 export const findOne: ResponseBook = {
   _id: '5dff58da85eb210f0aac43af',

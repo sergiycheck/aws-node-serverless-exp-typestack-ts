@@ -34,8 +34,8 @@ class BooksController {
 
   @Post('/books')
   async create(@Body() params: CreateBookDTO, @Res() res: Response) {
-    const { event, context } = getCurrentInvoke();
-    CustomLog.log('functionName', context.functionName);
+    // TODO: how to mock getCurrentInvoke() ?
+    // const { event, context } = getCurrentInvoke();
 
     try {
       const result = await this.booksService.createBook({
@@ -81,9 +81,6 @@ class BooksController {
 
   @Get('/books/:id')
   async findOne(@Param('id') id: number, @Res() res: Response) {
-    const { event, context } = getCurrentInvoke();
-    CustomLog.log('memoryLimitInMB: ', context.memoryLimitInMB);
-
     try {
       const result = await this.booksService.findOneBookById(id);
 

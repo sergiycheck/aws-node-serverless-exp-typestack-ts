@@ -1,105 +1,187 @@
+import { UpdateBookDTO } from './../src/app/model/dto/dtos.dto';
+import 'reflect-metadata';
+import { Container } from 'typedi';
+import { MessageUtil } from '../src/app/utils/message';
 import * as bookMocks from '../mocks/books.mock';
 import BooksController from '../src/app/controllers/books.controller';
-import { Books } from '../src/app/model';
-import { Result } from '../src/app/utils/message';
+import BooksService from '../src/app/service/books.service';
+import { CreateBookDTO } from '../src/app/model/dto/dtos.dto';
+import { BookModelName, Books } from '../src/app/model';
+import _ from 'lodash';
 
-const booksController = new BooksController(Books);
+// import path from 'path';
+// const rewire = require('rewire');
+// import rewire from 'rewire';
 
 describe('mock service methods, test methods of controller', () => {
+  let booksController: BooksController;
+  let booksService;
+
+  const resMock: any = {
+    code: null,
+    response: null,
+    status: function (code: number) {
+      this.code = code;
+      return this;
+    },
+    json: function (data: any) {
+      this.response = data;
+    },
+  };
+
+  beforeAll(() => {
+    Container.set(BookModelName, Books);
+    booksService = Container.get(BooksService);
+    const msgUtil = Container.get(MessageUtil);
+    booksController = new BooksController(booksService, msgUtil);
+  });
+
+  // test('long runing test because of compiling ts and rewiring private members', async () => {
+  //   const fullPath = path.resolve(
+  //     __dirname,
+  //     '../src/app/controllers/books.controller'
+  //   );
+  //   let controllerModule = rewire(fullPath) as ReturnType<typeof rewire> & {
+  //     default: BooksController;
+  //   };
+
+  //   let getCurrentInvokeMock = function () {
+  //     return {
+  //       event: {},
+  //       context: { functionName: 'create' },
+  //     };
+  //   };
+
+  //   controllerModule.__set__('@vendia/serverless-express', {
+  //     getCurrentInvoke: getCurrentInvokeMock,
+  //   });
+
+  //   const { _id, __v, createdAt, ...data } = bookMocks.create;
+
+  //   const params: CreateBookDTO = {
+  //     ...data,
+  //   };
+
+  //   const resMock: any = {
+  //     code: null,
+  //     response: null,
+  //     status: function (code: number) {
+  //       this.code = code;
+  //     },
+  //     json: function (data: any) {
+  //       this.response = data;
+  //     },
+  //   };
+
+  //   Container.set(BookModelName, Books);
+  //   let booksService = Container.get(BooksService);
+
+  //   const spyCreateBook = jest
+  //     .spyOn(booksService, 'createBook')
+  //     .mockImplementation(() => Promise.resolve(bookMocks.create));
+
+  //   const msgUtil = Container.get(MessageUtil);
+  //   let booksController = new BooksController(booksService, msgUtil);
+
+  //   controllerModule.default = booksController;
+
+  //   const res = await controllerModule.default.create(params, resMock);
+
+  //   expect(spyCreateBook).toHaveBeenCalled();
+
+  //   expect(resMock.response).toStrictEqual(bookMocks.create);
+
+  //   spyCreateBook.mockRestore();
+  // });
+
   test('mock create book', async () => {
+    const { _id, __v, createdAt, ...data } = bookMocks.create;
+
+    const params: CreateBookDTO = {
+      ...data,
+    };
+
     const spyCreateBook = jest
-      .spyOn(booksController, 'createBook')
+      .spyOn(booksService, 'createBook')
       .mockImplementation(() => Promise.resolve(bookMocks.create));
 
-    const { _id, __v, createdAt, ...data } = bookMocks.create;
-    const event: any = {
-      body: JSON.stringify({
-        ...data,
-      }),
-    };
-    const context: any = { functionName: 'create' };
-    const res = await booksController.create(event, context);
+    let localResMock = _.clone(resMock);
+
+    await booksController.create(params, localResMock);
 
     expect(spyCreateBook).toHaveBeenCalled();
-    const body = JSON.parse(res.body) as Result;
-    expect(body.data).toStrictEqual(bookMocks.create);
+
+    expect(localResMock.response.data).toStrictEqual(bookMocks.create);
+
     spyCreateBook.mockRestore();
   });
 
   test('mock update book', async () => {
     const { update } = bookMocks;
     const spy = jest
-      .spyOn(booksController, 'updateBooks')
+      .spyOn(booksService, 'updateBooks')
       .mockImplementation(() => Promise.resolve(update));
 
     const { _id, __v, createdAt, ...data } = update;
-    const event: any = {
-      body: JSON.stringify({
-        ...data,
-      }),
-      pathParameters: {
-        id: update.id,
-      },
+
+    const params: UpdateBookDTO = {
+      ...data,
     };
 
-    const res = await booksController.update(event);
+    let localResMock = _.clone(resMock);
+    await booksController.update(update.id, params, localResMock);
 
     expect(spy).toHaveBeenCalled();
-    const body = JSON.parse(res.body) as Result;
-    expect(body.data).toStrictEqual(update);
+    expect(localResMock.response.data).toStrictEqual(update);
+
     spy.mockRestore();
   });
 
   test('mock find book', async () => {
     const { find } = bookMocks;
     const spy = jest
-      .spyOn(booksController, 'findBooks')
+      .spyOn(booksService, 'findBooks')
       .mockImplementation(() => Promise.resolve(find));
 
-    const res = await booksController.find();
+    let localResMock = _.clone(resMock);
+
+    await booksController.find(localResMock);
 
     expect(spy).toHaveBeenCalled();
-    const body = JSON.parse(res.body) as Result;
-    expect(body.data).toStrictEqual(find);
+    expect(localResMock.response.data).toStrictEqual(find);
     spy.mockRestore();
   });
 
   test('mock findOne book', async () => {
     const { findOne } = bookMocks;
     const spy = jest
-      .spyOn(booksController, 'findOneBookById')
+      .spyOn(booksService, 'findOneBookById')
       .mockImplementation(() => Promise.resolve(findOne));
 
-    const event: any = {
-      pathParameters: {
-        id: findOne.id,
-      },
-    };
-    const context: any = { memoryLimitInMB: 1024 };
-    const res = await booksController.findOne(event, context);
+    let localResMock = _.clone(resMock);
+    await booksController.findOne(findOne.id, localResMock);
 
     expect(spy).toHaveBeenCalled();
-    const body = JSON.parse(res.body) as Result;
-    expect(body.data).toStrictEqual(findOne);
+    expect(localResMock.response.data).toStrictEqual(findOne);
     spy.mockRestore();
   });
 
   test('mock deleteOne book', async () => {
     const { deleteOne } = bookMocks;
     const spy = jest
-      .spyOn(booksController, 'deleteOneBookById')
+      .spyOn(booksService, 'deleteOneBookById')
       .mockImplementation(() => Promise.resolve(deleteOne));
 
-    const event: any = {
-      pathParameters: {
-        id: 123,
-      },
+    const params = {
+      id: '123',
     };
-    const res = await booksController.deleteOne(event);
+
+    let localResMock = _.clone(resMock);
+
+    await booksController.deleteOne(params.id, localResMock);
 
     expect(spy).toHaveBeenCalled();
-    const body = JSON.parse(res.body) as Result;
-    expect(body.data).toStrictEqual(deleteOne);
+    expect(localResMock.response.data).toStrictEqual(deleteOne);
     spy.mockRestore();
   });
 });
