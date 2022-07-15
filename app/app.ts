@@ -1,12 +1,18 @@
 import 'reflect-metadata';
-import express, { Response } from 'express';
-import connectToMongoDb from './model/mongoose-db';
-import { BookModelName, Books } from './model';
-import errorHandler from './error-handler';
+import { Response } from 'express';
 import { getCurrentInvoke } from '@vendia/serverless-express';
 import { createExpressServer, useContainer } from 'routing-controllers';
 import { Container } from 'typedi';
+import bodyParser from 'body-parser';
+
 import BooksController from './controllers/books.controller';
+import errorHandler from './error-handler';
+import connectToMongoDb from './model/mongoose-db';
+import { BookModelName, Books } from './model';
+import {
+  jsonParser,
+  urlEncodedParser,
+} from './middlewares/jsonParser.middleware';
 
 export default async function createServer() {
   await connectToMongoDb();
@@ -26,7 +32,10 @@ export default async function createServer() {
       },
     },
   });
-  app.use(express.json());
+
+  app.use(urlEncodedParser);
+  app.use(jsonParser);
+
   app.disable('x-powered-by');
   app.use(errorHandler);
 

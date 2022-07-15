@@ -17,8 +17,7 @@ class BooksService {
   public async createBook(params: CreateBookDTO): Promise<object> {
     try {
       const result = await this.books.create({
-        name: params.name,
-        id: params.id,
+        ...params,
       });
 
       return result;
@@ -43,8 +42,12 @@ class BooksService {
     return (await this.books.findOne({ id })) as unknown as ResponseBook;
   }
 
-  public async deleteOneBookById(id: number) {
-    return (await this.books.deleteOne({ id })) as any;
+  public async deleteOneBookById(id: string) {
+    let checkIfNum = id as unknown as number;
+    if (!isNaN(checkIfNum))
+      return (await this.books.deleteOne({ id: Number(checkIfNum) })) as any;
+    else if (typeof id === 'string')
+      return (await this.books.deleteOne({ _id: id })) as any;
   }
 }
 

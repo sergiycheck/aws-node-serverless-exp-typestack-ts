@@ -21,10 +21,12 @@ import {
 import { loggingMiddleware } from '../middlewares/logger.middleware';
 import { getCurrentInvoke } from '@vendia/serverless-express';
 import { Response } from 'express';
+import { jsonParser } from '../middlewares/jsonParser.middleware';
 
 @Controller()
 @Service()
 @UseBefore(loggingMiddleware)
+@UseBefore(jsonParser)
 //TODO: can not useAfterMiddleware
 // Cannot set headers after they are sent to the client
 class BooksController {
@@ -97,9 +99,9 @@ class BooksController {
   }
 
   @Delete('/books/:id')
-  async deleteOne(@Param('id') id: number, @Res() res: Response) {
+  async deleteOne(@Param('id') id: string, @Res() res: Response) {
     try {
-      const result = await this.booksService.deleteOneBookById(Number(id));
+      const result = await this.booksService.deleteOneBookById(id);
 
       if (result.deletedCount === 0) {
         return this.messageUtil.error(
