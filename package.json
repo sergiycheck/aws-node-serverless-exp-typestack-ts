@@ -10,7 +10,7 @@
     "lint": "eslint \"{src}/**/*.ts\" --fix",
     "local:dev-ts": "rimraf .build && export NODE_ENV=dev && sls offline --config sls-ts.yml",
     "local:dev-esb": "rimraf .esbuild && export NODE_ENV=dev && sls offline --config sls-esb.yml",
-    "deploy": "serverless deploy",
+    "deploy-ts": "sls deploy --config sls-ts.yml",
     "test-jest-envs": "export JEST_JUNIT_OUTPUT_DIR=test-results/jest && export JEST_JUNIT_OUTPUT_FILE=test-results/jest/junit.xml && jest",
     "test:jest": "jest",
     "test:jest-c": "ts-node -O '{\"module\":\"commonjs\"}' node_modules/jest/bin/jest.js",
