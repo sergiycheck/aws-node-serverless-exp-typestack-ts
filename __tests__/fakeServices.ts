@@ -6,7 +6,7 @@ export class FakeVendiaSlsService implements IVendiaSlsService {
   _context: any = {};
   _event: any = {};
 
-  getCurrentInvoke() {
+  callGetCurrentInvoke() {
     return {
       event: this._event,
       context: this._context,

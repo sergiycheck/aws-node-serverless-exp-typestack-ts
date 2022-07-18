@@ -17,7 +17,6 @@ import {
   Res,
 } from 'routing-controllers';
 import { loggingMiddleware } from '../middlewares/logger.middleware';
-import { getCurrentInvoke } from '@vendia/serverless-express';
 import { Response } from 'express';
 import { jsonParser } from '../middlewares/jsonParser.middleware';
 
@@ -36,7 +35,7 @@ class BooksController {
 
   @Post('/books')
   async create(@Body() params: CreateBookDTO, @Res() res: Response) {
-    const { event, context } = this.vendiaSlsService.getCurrentInvoke();
+    const { event, context } = this.vendiaSlsService.callGetCurrentInvoke();
     CustomLog.log('functionName', context.functionName);
 
     try {
@@ -83,7 +82,7 @@ class BooksController {
 
   @Get('/books/:id')
   async findOne(@Param('id') id: number, @Res() res: Response) {
-    const { context } = this.vendiaSlsService.getCurrentInvoke();
+    const { context } = this.vendiaSlsService.callGetCurrentInvoke();
     CustomLog.log('memoryLimitInMB: ', context.memoryLimitInMB);
 
     try {

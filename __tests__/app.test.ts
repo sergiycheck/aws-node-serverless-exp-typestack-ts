@@ -105,7 +105,7 @@ describe('mock service methods, test methods of controller', () => {
     };
 
     const spyFakeVendiaSlsService = jest
-      .spyOn(fakeVendiaSlsService, 'getCurrentInvoke')
+      .spyOn(fakeVendiaSlsService, 'callGetCurrentInvoke')
       .mockImplementation(() => ({
         event: {},
         context: {
@@ -169,7 +169,7 @@ describe('mock service methods, test methods of controller', () => {
     const { findOne } = bookMocks;
 
     const spyFakeVendiaSlsService = jest
-      .spyOn(fakeVendiaSlsService, 'getCurrentInvoke')
+      .spyOn(fakeVendiaSlsService, 'callGetCurrentInvoke')
       .mockImplementation(() => ({
         event: {},
         context: {

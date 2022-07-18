@@ -1,15 +1,16 @@
 import { Service } from 'typedi';
+import { getCurrentInvoke } from '@vendia/serverless-express';
 
 export interface IVendiaSlsService {
-  getCurrentInvoke(): { event: any; context: any };
+  callGetCurrentInvoke(): { event: any; context: any };
 }
 
 @Service()
 export class VendiaSlsService implements IVendiaSlsService {
   constructor() {}
 
-  getCurrentInvoke() {
-    const { event, context } = this.getCurrentInvoke();
+  callGetCurrentInvoke() {
+    const { event, context } = getCurrentInvoke();
 
     return {
       event,
