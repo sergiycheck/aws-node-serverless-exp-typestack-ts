@@ -1,3 +1,4 @@
+import { VendiaSlsService } from './../service/vendia-serveless.service';
 import { CustomLog } from '../logger/customLogger';
 import { UpdateBookDTO } from '../model/dto/dtos.dto';
 import { MessageUtil } from '../utils/message';
@@ -29,13 +30,14 @@ import { jsonParser } from '../middlewares/jsonParser.middleware';
 class BooksController {
   constructor(
     protected booksService: BooksService,
-    protected messageUtil: MessageUtil
+    protected messageUtil: MessageUtil,
+    protected vendiaSlsService: VendiaSlsService
   ) {}
 
   @Post('/books')
   async create(@Body() params: CreateBookDTO, @Res() res: Response) {
-    // TODO: how to mock getCurrentInvoke() ?
-    // const { event, context } = getCurrentInvoke();
+    const { event, context } = this.vendiaSlsService.getCurrentInvoke();
+    CustomLog.log('functionName', context.functionName);
 
     try {
       const result = await this.booksService.createBook({
@@ -81,6 +83,9 @@ class BooksController {
 
   @Get('/books/:id')
   async findOne(@Param('id') id: number, @Res() res: Response) {
+    const { context } = this.vendiaSlsService.getCurrentInvoke();
+    CustomLog.log('memoryLimitInMB: ', context.memoryLimitInMB);
+
     try {
       const result = await this.booksService.findOneBookById(id);
 

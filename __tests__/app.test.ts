@@ -1,21 +1,19 @@
+import { VendiaSlsService } from './../src/app/service/vendia-serveless.service';
 import { UpdateBookDTO } from './../src/app/model/dto/dtos.dto';
 import 'reflect-metadata';
 import { Container } from 'typedi';
-import { MessageUtil } from '../src/app/utils/message';
 import * as bookMocks from '../mocks/books.mock';
 import BooksController from '../src/app/controllers/books.controller';
 import BooksService from '../src/app/service/books.service';
 import { CreateBookDTO } from '../src/app/model/dto/dtos.dto';
 import { BookModelName, Books } from '../src/app/model';
 import _ from 'lodash';
-
-// import path from 'path';
-// const rewire = require('rewire');
-// import rewire from 'rewire';
+import { FakeVendiaSlsService } from './fakeServices';
 
 describe('mock service methods, test methods of controller', () => {
   let booksController: BooksController;
-  let booksService;
+  let booksService: BooksService;
+  let fakeVendiaSlsService: FakeVendiaSlsService;
 
   const resMock: any = {
     code: null,
@@ -32,8 +30,13 @@ describe('mock service methods, test methods of controller', () => {
   beforeAll(() => {
     Container.set(BookModelName, Books);
     booksService = Container.get(BooksService);
-    const msgUtil = Container.get(MessageUtil);
-    booksController = new BooksController(booksService, msgUtil);
+    // const msgUtil = Container.get(MessageUtil);
+    fakeVendiaSlsService = new FakeVendiaSlsService();
+
+    Container.set(VendiaSlsService, fakeVendiaSlsService);
+    // booksController = new BooksController(booksService, msgUtil);
+
+    booksController = Container.get(BooksController);
   });
 
   // test('long runing test because of compiling ts and rewiring private members', async () => {
@@ -101,6 +104,15 @@ describe('mock service methods, test methods of controller', () => {
       ...data,
     };
 
+    const spyFakeVendiaSlsService = jest
+      .spyOn(fakeVendiaSlsService, 'getCurrentInvoke')
+      .mockImplementation(() => ({
+        event: {},
+        context: {
+          functionName: 'create',
+        },
+      }));
+
     const spyCreateBook = jest
       .spyOn(booksService, 'createBook')
       .mockImplementation(() => Promise.resolve(bookMocks.create));
@@ -109,6 +121,7 @@ describe('mock service methods, test methods of controller', () => {
 
     await booksController.create(params, localResMock);
 
+    expect(spyFakeVendiaSlsService).toHaveBeenCalled();
     expect(spyCreateBook).toHaveBeenCalled();
 
     expect(localResMock.response.data).toStrictEqual(bookMocks.create);
@@ -154,6 +167,16 @@ describe('mock service methods, test methods of controller', () => {
 
   test('mock findOne book', async () => {
     const { findOne } = bookMocks;
+
+    const spyFakeVendiaSlsService = jest
+      .spyOn(fakeVendiaSlsService, 'getCurrentInvoke')
+      .mockImplementation(() => ({
+        event: {},
+        context: {
+          memoryLimitInMB: 123,
+        },
+      }));
+
     const spy = jest
       .spyOn(booksService, 'findOneBookById')
       .mockImplementation(() => Promise.resolve(findOne));
@@ -161,6 +184,7 @@ describe('mock service methods, test methods of controller', () => {
     let localResMock = _.clone(resMock);
     await booksController.findOne(findOne.id, localResMock);
 
+    expect(spyFakeVendiaSlsService).toHaveBeenCalled();
     expect(spy).toHaveBeenCalled();
     expect(localResMock.response.data).toStrictEqual(findOne);
     spy.mockRestore();
